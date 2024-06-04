@@ -1,0 +1,12 @@
+Development requirements:
+- x64 Native Tools for VS 2022
+- cmake>=3.13
+
+Testing requirements:
+- Microsoft Visual C++ 2015-2022 Redistributable (x86 + x64)
+
+Configure:
+cmake -S . -B build -G Ninja -D CMAKE_BUILD_TYPE=Release
+
+Build:
+cmake --build build

@@ -1,0 +1,8 @@
+.vscode
+
+__pycache__
+*.pyc
+*.whl
+
+cpp/build
+python/acad-extractor/build
