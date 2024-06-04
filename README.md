@@ -2,6 +2,12 @@
 
 A quick tool to extract block attributes and properties from AutoCAD drawings.
 
+## Installation
+
+```bash
+pip install acad-extractor
+```
+
 ## Usage
 
 ```python
