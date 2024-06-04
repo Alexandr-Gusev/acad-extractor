@@ -15,15 +15,14 @@ set(SRC core.cpp utils.cpp)
 set(BINDINGS early late)
 
 foreach(BINDING ${BINDINGS})
-    if(BINDING MATCHES "early")
-        add_compile_definitions(AE_EARLY_BINDING)
-    endif()
-
     set(PREFIX ${PROJECT_NAME}-${BINDING}-binding)
 
     # static
 
     add_library(${PREFIX}-static STATIC ${SRC})
+    if(BINDING MATCHES "early")
+        target_compile_definitions(${PREFIX}-static PRIVATE AE_EARLY_BINDING)
+    endif()
 
     add_executable(${PREFIX}-test-static test.cpp utils.cpp)
     target_link_libraries(${PREFIX}-test-static ${PREFIX}-static)
@@ -32,6 +31,9 @@ foreach(BINDING ${BINDINGS})
 
     add_library(${PREFIX}-shared SHARED ${SRC})
     target_compile_definitions(${PREFIX}-shared PRIVATE AE_EXPORT)
+    if(BINDING MATCHES "early")
+        target_compile_definitions(${PREFIX}-shared PRIVATE AE_EARLY_BINDING)
+    endif()
 
     add_executable(${PREFIX}-test-shared test.cpp utils.cpp)
     target_compile_definitions(${PREFIX}-test-shared PRIVATE AE_IMPORT)
@@ -40,4 +42,7 @@ foreach(BINDING ${BINDINGS})
     # src
 
     add_executable(${PREFIX}-test test.cpp ${SRC})
+    if(BINDING MATCHES "early")
+        target_compile_definitions(${PREFIX}-test PRIVATE AE_EARLY_BINDING)
+    endif()
 endforeach()
