@@ -4,18 +4,20 @@
 #include "core.h"
 %End
 
-SIP_PYOBJECT select_on_screen(SIP_PYLIST names, SIP_PYLIST attrs_list, SIP_PYLIST props_list);
+SIP_PYOBJECT select_on_screen(SIP_PYLIST names, SIP_PYLIST attrs_list, SIP_PYLIST props_list, SIP_PYLIST handles = Py_None);
 %MethodCode
     PyObject* names_py = a0;
     PyObject* attrs_list_py = a1;
     PyObject* props_list_py = a2;
+    PyObject* handles_py = a3;
 
     std::vector<BSTR> names;
     std::vector<std::vector<std::pair<BSTR, BSTR>>> attrs_list;
     std::vector<std::vector<std::pair<BSTR, VARIANT>>> props_list;
+    std::vector<BSTR> handles;
     try
     {
-        long dt = select_on_screen(&names, &attrs_list, &props_list);
+        long dt = select_on_screen(&names, &attrs_list, &props_list, handles_py != Py_None ? &handles : 0);
 
         for (const BSTR& name : names)
         {
@@ -23,6 +25,17 @@ SIP_PYOBJECT select_on_screen(SIP_PYLIST names, SIP_PYLIST attrs_list, SIP_PYLIS
             SysFreeString(name);
             PyList_Append(names_py, name_py);
             Py_XDECREF(name_py);
+        }
+
+        if (handles_py != Py_None)
+        {
+            for (const BSTR& handle : handles)
+            {
+                PyObject* handle_py = PyUnicode_FromWideChar(handle, -1);
+                SysFreeString(handle);
+                PyList_Append(handles_py, handle_py);
+                Py_XDECREF(handle_py);
+            }
         }
 
         for (const auto& attrs : attrs_list)

@@ -2,7 +2,7 @@ import win32com.client
 import time
 
 
-def select_on_screen(names, attrs_list, props_list):
+def select_on_screen(names, attrs_list, props_list, handles):
     try:
         app = win32com.client.Dispatch("AutoCAD.Application")
     except:
@@ -31,6 +31,7 @@ def select_on_screen(names, attrs_list, props_list):
     for item in selection:
         if item.EntityName == "AcDbBlockReference":
             names.append(item.EffectiveName)
+            handles.append(item.Handle)
 
             attrs = []
             for attr in item.GetAttributes():
@@ -49,11 +50,12 @@ if __name__ == "__main__":
     names = []
     attrs_list = []
     props_list = []
-    dt = select_on_screen(names, attrs_list, props_list)
+    handles = []
+    dt = select_on_screen(names, attrs_list, props_list, handles)
     print(f"{len(names)} at {dt} ms")
     for i, name in enumerate(names):
         print("-" * 70)
-        print(name)
+        print(f"{name} {handles[i]}")
         for name, value in attrs_list[i]:
             print(f"attr {name} = {value}")
         for name, value in props_list[i]:

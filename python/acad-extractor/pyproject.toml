@@ -4,7 +4,7 @@ build-backend = "sipbuild.api"
 
 [project]
 name = "acad-extractor"
-version = "1.0.3"
+version = "1.0.4"
 authors = [
   { name="Alexandr Gusev", email="alphacity@yandex.ru" },
 ]

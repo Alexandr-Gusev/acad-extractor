@@ -23,7 +23,8 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
 (
     std::vector<BSTR>* const names,
     std::vector<std::vector<std::pair<BSTR, BSTR>>>* const attrs_list,
-    std::vector<std::vector<std::pair<BSTR, VARIANT>>>* const props_list
+    std::vector<std::vector<std::pair<BSTR, VARIANT>>>* const props_list,
+    std::vector<BSTR>* const handles = 0
 );
 
 #endif // CORE_H

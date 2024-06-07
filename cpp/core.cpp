@@ -23,7 +23,8 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
 (
     std::vector<BSTR>* const names,
     std::vector<std::vector<std::pair<BSTR, BSTR>>>* const attrs_list,
-    std::vector<std::vector<std::pair<BSTR, VARIANT>>>* const props_list
+    std::vector<std::vector<std::pair<BSTR, VARIANT>>>* const props_list,
+    std::vector<BSTR>* const handles
 )
 {
 #ifdef AE_EXPORT
@@ -108,6 +109,14 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
             THROW_IF_FAILED(block->get_EffectiveName(&EffectiveName));
 
             names->push_back(EffectiveName);
+
+            if (handles)
+            {
+                BSTR Handle;
+                THROW_IF_FAILED(block->get_Handle(&Handle));
+
+                handles->push_back(Handle);
+            }
 
             long lower_bound, upper_bound;
 
@@ -229,9 +238,10 @@ static void com_req(VARIANT* result, IDispatch* p, WORD flags, LPCOLESTR name, D
 
 AE_EXTERN_C long AE_DECL_SPEC select_on_screen
 (
-    std::vector<BSTR>* const nameRows,
+    std::vector<BSTR>* const names,
     std::vector<std::vector<std::pair<BSTR, BSTR>>>* const attrs_list,
-    std::vector<std::vector<std::pair<BSTR, VARIANT>>>* const props_list
+    std::vector<std::vector<std::pair<BSTR, VARIANT>>>* const props_list,
+    std::vector<BSTR>* const handles
 )
 {
 #ifdef AE_EXPORT
@@ -310,6 +320,7 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
     DISPID ItemDispID = DISPID_UNKNOWN;
     DISPID EntityNameDispID = DISPID_UNKNOWN;
     DISPID EffectiveNameDispID = DISPID_UNKNOWN;
+    DISPID HandleDispID = DISPID_UNKNOWN;
     DISPID GetAttributesDispID = DISPID_UNKNOWN;
     DISPID TagStringDispID = DISPID_UNKNOWN;
     DISPID TextStringDispID = DISPID_UNKNOWN;
@@ -336,7 +347,15 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
             VARIANT EffectiveName;
             com_req(&EffectiveName, Item, DISPATCH_PROPERTYGET, L"EffectiveName", &EffectiveNameDispID, args, 0);
 
-            nameRows->push_back(V_BSTR(&EffectiveName));
+            names->push_back(V_BSTR(&EffectiveName));
+
+            if (handles)
+            {
+                VARIANT Handle;
+                com_req(&Handle, Item, DISPATCH_PROPERTYGET, L"Handle", &HandleDispID, args, 0);
+
+                handles->push_back(V_BSTR(&Handle));
+            }
 
             long lower_bound, upper_bound;
 
