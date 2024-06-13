@@ -8,7 +8,7 @@ if __name__ == "__main__":
     props_list = []
     handles = []
     dt = select_on_screen(names, attrs_list, props_list, handles)
-    print(f"{len(names)} at {dt} ms")
+    print(f"Processed {len(names)} at {dt} ms")
     for i, name in enumerate(names):
         print("-" * 70)
         print(f"{name} {handles[i]}")

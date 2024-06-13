@@ -18,8 +18,12 @@ names = []
 attrs_list = []
 props_list = []
 handles = []
-dt = select_on_screen(names, attrs_list, props_list, handles)
-print(f"{len(names)} at {dt} ms")
+def callback(processed, total):
+    print(f"Processed {processed}/{total}")
+print("-" * 70)
+dt = select_on_screen(names, attrs_list, props_list, handles, callback)
+print("-" * 70)
+print(f"Processed {len(names)} at {dt} ms")
 for i, name in enumerate(names):
     print("-" * 70)
     print(f"{name} {handles[i]}")

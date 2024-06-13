@@ -4,20 +4,32 @@
 #include "core.h"
 %End
 
-SIP_PYOBJECT select_on_screen(SIP_PYLIST names, SIP_PYLIST attrs_list, SIP_PYLIST props_list, SIP_PYLIST handles = Py_None);
+SIP_PYOBJECT select_on_screen(SIP_PYLIST names, SIP_PYLIST attrs_list, SIP_PYLIST props_list, SIP_PYLIST handles = Py_None, SIP_PYCALLABLE callback = Py_None);
 %MethodCode
     PyObject* names_py = a0;
     PyObject* attrs_list_py = a1;
     PyObject* props_list_py = a2;
     PyObject* handles_py = a3;
+    PyObject* callback_py = a4;
 
     std::vector<BSTR> names;
     std::vector<std::vector<std::pair<BSTR, BSTR>>> attrs_list;
     std::vector<std::vector<std::pair<BSTR, VARIANT>>> props_list;
     std::vector<BSTR> handles;
+    std::function<void(int processed, int total)> callback;
+    if (callback_py != Py_None)
+    {
+        callback = [callback_py](int processed, int total)
+        {
+            PyObject* args = Py_BuildValue("(ii)", processed, total);
+            PyObject* result = PyObject_Call(callback_py, args, 0);
+            Py_XDECREF(result);
+            Py_XDECREF(args);
+        };
+    }
     try
     {
-        long dt = select_on_screen(&names, &attrs_list, &props_list, handles_py != Py_None ? &handles : 0);
+        long dt = select_on_screen(&names, &attrs_list, &props_list, handles_py != Py_None ? &handles : 0, callback);
 
         for (const BSTR& name : names)
         {

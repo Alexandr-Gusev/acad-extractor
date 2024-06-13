@@ -2,7 +2,7 @@ import win32com.client
 import time
 
 
-def select_on_screen(names, attrs_list, props_list, handles):
+def select_on_screen(names, attrs_list, props_list, handles=None, callback=None):
     try:
         app = win32com.client.Dispatch("AutoCAD.Application")
     except:
@@ -28,10 +28,17 @@ def select_on_screen(names, attrs_list, props_list, handles):
         raise RuntimeError("selection error")
 
     t = time.time()
-    for item in selection:
+    count = len(selection)
+    callback_delta = int(count / 100)
+    if callback_delta == 0:
+        callback_delta = 1
+    for i, item in enumerate(selection):
+        if callback is not None and i % callback_delta == 0:
+            callback(i, count)
         if item.EntityName == "AcDbBlockReference":
             names.append(item.EffectiveName)
-            handles.append(item.Handle)
+            if handles is not None:
+                handles.append(item.Handle)
 
             attrs = []
             for attr in item.GetAttributes():
@@ -42,6 +49,8 @@ def select_on_screen(names, attrs_list, props_list, handles):
             for prop in item.GetDynamicBlockProperties():
                 props.append((prop.PropertyName, prop.Value))
             props_list.append(props)
+    if callback is not None:
+        callback(count, count)
     return int((time.time() - t) * 1000)
 
 
@@ -52,7 +61,7 @@ if __name__ == "__main__":
     props_list = []
     handles = []
     dt = select_on_screen(names, attrs_list, props_list, handles)
-    print(f"{len(names)} at {dt} ms")
+    print(f"Processed {len(names)} at {dt} ms")
     for i, name in enumerate(names):
         print("-" * 70)
         print(f"{name} {handles[i]}")

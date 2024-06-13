@@ -24,7 +24,8 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
     std::vector<BSTR>* const names,
     std::vector<std::vector<std::pair<BSTR, BSTR>>>* const attrs_list,
     std::vector<std::vector<std::pair<BSTR, VARIANT>>>* const props_list,
-    std::vector<BSTR>* const handles
+    std::vector<BSTR>* const handles,
+    std::function<void(int processed, int total)> callback
 )
 {
 #ifdef AE_EXPORT
@@ -88,8 +89,15 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
 
     long Count;
     THROW_IF_FAILED(ActiveSelectionSet->get_Count(&Count));
+    int callback_delta = Count / 100; // 1%
+    if (!callback_delta) callback_delta = 1;
     for (long i = 0; i < Count; i++)
     {
+        if (callback && i % callback_delta == 0)
+        {
+            callback(i, Count);
+        }
+
         VARIANT index;
         V_VT(&index) = VT_I4;
         V_I4(&index) = i;
@@ -193,6 +201,10 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
 
         Item->Release();
     }
+    if (callback)
+    {
+        callback(Count, Count);
+    }
 
     long dt = GetTickCount() - t;
 
@@ -241,7 +253,8 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
     std::vector<BSTR>* const names,
     std::vector<std::vector<std::pair<BSTR, BSTR>>>* const attrs_list,
     std::vector<std::vector<std::pair<BSTR, VARIANT>>>* const props_list,
-    std::vector<BSTR>* const handles
+    std::vector<BSTR>* const handles,
+    std::function<void(int processed, int total)> callback
 )
 {
 #ifdef AE_EXPORT
@@ -327,8 +340,15 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
     DISPID GetDynamicBlockPropertiesDispID = DISPID_UNKNOWN;
     DISPID PropertyNameDispID = DISPID_UNKNOWN;
     DISPID ValueDispID = DISPID_UNKNOWN;
+    int callback_delta = Count / 100; // 1%
+    if (!callback_delta) callback_delta = 1;
     for (long i = 0; i < Count; i++)
     {
+        if (callback && i % callback_delta == 0)
+        {
+            callback(i, Count);
+        }
+
         V_VT(&args[0]) = VT_I4;
         V_I4(&args[0]) = i;
 
@@ -423,6 +443,10 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
         VariantClear(&EntityName);
 
         Item->Release();
+    }
+    if (callback)
+    {
+        callback(Count, Count);
     }
 
     long dt = GetTickCount() - t;

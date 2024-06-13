@@ -14,7 +14,7 @@ int main(void)
     try
     {
         DWORD dt = select_on_screen(&names, &attrs_list, &props_list, &handles);
-        std::cout << names.size() << " at " << dt << " ms" << std::endl;
+        std::cout << "Processed " << names.size() << " at " << dt << " ms" << std::endl;
     }
     catch (const std::exception& e)
     {
