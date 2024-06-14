@@ -138,7 +138,7 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
             THROW_IF_FAILED(SafeArrayGetLBound(V_ARRAY(&Attributes), 1, &lower_bound));
             THROW_IF_FAILED(SafeArrayGetUBound(V_ARRAY(&Attributes), 1, &upper_bound));
 
-            for (long j = lower_bound; j < upper_bound; j++)
+            for (long j = lower_bound; j <= upper_bound; j++)
             {
                 IDispatch* Attribute_;
                 THROW_IF_FAILED(SafeArrayGetElement(V_ARRAY(&Attributes), &j, &Attribute_));
@@ -171,7 +171,7 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
             THROW_IF_FAILED(SafeArrayGetLBound(V_ARRAY(&Properties), 1, &lower_bound));
             THROW_IF_FAILED(SafeArrayGetUBound(V_ARRAY(&Properties), 1, &upper_bound));
 
-            for (long j = lower_bound; j < upper_bound; j++)
+            for (long j = lower_bound; j <= upper_bound; j++)
             {
                 IDispatch* Property_;
                 THROW_IF_FAILED(SafeArrayGetElement(V_ARRAY(&Properties), &j, &Property_));
@@ -389,7 +389,7 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
             THROW_IF_FAILED(SafeArrayGetLBound(V_ARRAY(&Attributes), 1, &lower_bound));
             THROW_IF_FAILED(SafeArrayGetUBound(V_ARRAY(&Attributes), 1, &upper_bound));
 
-            for (long j = lower_bound; j < upper_bound; j++)
+            for (long j = lower_bound; j <= upper_bound; j++)
             {
                 IDispatch* Attribute;
                 THROW_IF_FAILED(SafeArrayGetElement(V_ARRAY(&Attributes), &j, &Attribute));
@@ -419,7 +419,7 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
             THROW_IF_FAILED(SafeArrayGetLBound(V_ARRAY(&Properties), 1, &lower_bound));
             THROW_IF_FAILED(SafeArrayGetUBound(V_ARRAY(&Properties), 1, &upper_bound));
 
-            for (long i = lower_bound; i < upper_bound; i++)
+            for (long i = lower_bound; i <= upper_bound; i++)
             {
                 IDispatch* Property;
                 THROW_IF_FAILED(SafeArrayGetElement(V_ARRAY(&Properties), &i, &Property));

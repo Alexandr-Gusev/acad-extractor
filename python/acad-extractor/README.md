@@ -21,8 +21,8 @@ print(f"Processed {len(names)} at {dt} ms")
 for i, name in enumerate(names):
     print("-" * 70)
     print(f"{name} {handles[i]}")
-    for name, value in attrs_list[i]:
-        print(f"attr {name} = {value}")
-    for name, value in props_list[i]:
-        print(f"prop {name} = {value}")
+    for attr_name, attr_value in attrs_list[i]:
+        print(f"attr {attr_name} = {attr_value}")
+    for prop_name, prop_value in props_list[i]:
+        print(f"prop {prop_name} = {prop_value}")
 ```
