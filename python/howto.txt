@@ -15,7 +15,7 @@ sip-wheel
 Test default package:
 pip uninstall acad-extractor
 pip install acad_extractor-X.Y.Z-cp39-none-win_amd64.whl
-python test_sip.py
+python test_pyd.py
 
 Notes:
 - TMPDIR must be ASCII
@@ -29,4 +29,4 @@ cmake --build build
 Test one package:
 pip uninstall acad-extractor-A-binding-B
 pip install acad_extractor_C_binding_D-X.Y.Z-cp39-none-win_amd64.whl
-python test_sip.py
+python test_pyd.py

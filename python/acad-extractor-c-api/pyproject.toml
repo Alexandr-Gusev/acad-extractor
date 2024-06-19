@@ -1,6 +1,6 @@
 [build-system]
-requires = ["sip==6.8.1"]
-build-backend = "sipbuild.api"
+requires = ["setuptools>=58.1.0"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "acad-extractor"
@@ -28,9 +28,3 @@ classifiers = [
 
 [project.urls]
 "Homepage" = "https://github.com/Alexandr-Gusev/acad-extractor"
-
-[tool.sip.bindings.acad-extractor]
-headers = ["core.h"]
-include-dirs = ["../../cpp"]
-libraries = ["oleaut32", "ole32"]
-library-dirs = ["../../cpp/build"]

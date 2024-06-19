@@ -1,0 +1,22 @@
+Development requirements:
+- x64 Native Tools for VS 2022
+- cmake>=3.13
+- python>=3.9.9
+- pip install setuptools==58.1.0
+- pip install abi3audit
+- acad-extractor dlls and libs
+
+Testing requirements:
+- Microsoft Visual C++ 2015-2022 Redistributable (x86 + x64)
+- python>=3.9.9
+
+Build default package:
+python -m build --wheel
+
+Test default package:
+pip uninstall acad-extractor
+pip install acad_extractor-X.Y.Z-cp39-abi3-win_amd64.whl
+python test_pyd.py
+
+ABI audit:
+abi3audit acad_extractor-X.Y.Z-cp39-abi3-win_amd64.whl -v

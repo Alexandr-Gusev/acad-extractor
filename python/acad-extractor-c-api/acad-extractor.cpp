@@ -1,16 +1,47 @@
-%Module(name=acad_extractor, language="C++")
+#define Py_LIMITED_API 0x03090000
 
-%ModuleCode
-#include "core.h"
-%End
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
 
-SIP_PYOBJECT select_on_screen(SIP_PYLIST names, SIP_PYLIST attrs_list, SIP_PYLIST props_list, SIP_PYLIST handles = Py_None, SIP_PYCALLABLE callback = Py_None);
-%MethodCode
-    PyObject* names_py = a0;
-    PyObject* attrs_list_py = a1;
-    PyObject* props_list_py = a2;
-    PyObject* handles_py = a3;
-    PyObject* callback_py = a4;
+#include "../../cpp/core.h"
+
+static PyObject* select_on_screen(PyObject* self, PyObject* args)
+{
+    PyObject* names_py = Py_None;
+    PyObject* attrs_list_py = Py_None;
+    PyObject* props_list_py = Py_None;
+    PyObject* handles_py = Py_None;
+    PyObject* callback_py = Py_None;
+    if (!PyArg_ParseTuple(args, "OOO|OO", &names_py, &attrs_list_py, &props_list_py, &handles_py, &callback_py))
+    {
+        PyErr_SetString(PyExc_RuntimeError, "bad args");
+        return 0;
+    }
+    if (!PyList_Check(names_py))
+    {
+        PyErr_SetString(PyExc_RuntimeError, "names is not not list");
+        return 0;
+    }
+    if (!PyList_Check(attrs_list_py))
+    {
+        PyErr_SetString(PyExc_RuntimeError, "attrs_list is not not list");
+        return 0;
+    }
+    if (!PyList_Check(props_list_py))
+    {
+        PyErr_SetString(PyExc_RuntimeError, "props_list is not not list");
+        return 0;
+    }
+    if (handles_py != Py_None && !PyList_Check(handles_py))
+    {
+        PyErr_SetString(PyExc_RuntimeError, "handles is not not list");
+        return 0;
+    }
+    if (callback_py != Py_None && !PyCallable_Check(callback_py))
+    {
+        PyErr_SetString(PyExc_RuntimeError, "callback is not not callable");
+        return 0;
+    }
 
     std::vector<BSTR> names;
     std::vector<std::vector<std::pair<BSTR, BSTR>>> attrs_list;
@@ -113,4 +144,21 @@ SIP_PYOBJECT select_on_screen(SIP_PYLIST names, SIP_PYLIST attrs_list, SIP_PYLIS
         PyErr_SetString(PyExc_RuntimeError, e.what());
     }
     return 0;
-%End
+}
+
+static PyMethodDef methods[] =
+{
+    {"select_on_screen", select_on_screen, METH_VARARGS, "select_on_screen"},
+    {0, 0, 0, 0}
+};
+
+static PyModuleDef module =
+{
+    PyModuleDef_HEAD_INIT,
+    "acad_extractor", "acad_extractor", -1, methods
+};
+
+PyMODINIT_FUNC PyInit_acad_extractor(void)
+{
+    return PyModule_Create(&module);
+}

@@ -6,3 +6,7 @@ __pycache__
 
 cpp/build
 python/acad-extractor/build
+python/acad-extractor-c-api/build
+
+python/acad-extractor-c-api/dist
+python/acad-extractor-c-api/acad_extractor.egg-info
