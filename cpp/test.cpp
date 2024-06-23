@@ -11,9 +11,10 @@ int main(void)
     std::vector<std::vector<std::pair<BSTR, BSTR>>> attrs_list;
     std::vector<std::vector<std::pair<BSTR, VARIANT>>> props_list;
     std::vector<BSTR> handles;
+    std::vector<std::vector<double>> points;
     try
     {
-        DWORD dt = select_on_screen(&names, &attrs_list, &props_list, &handles);
+        DWORD dt = select_on_screen(&names, &attrs_list, &props_list, &handles, 0, &points);
         std::cout << "Processed " << names.size() << " at " << dt << " ms" << std::endl;
     }
     catch (const std::exception& e)
@@ -24,7 +25,7 @@ int main(void)
     for (size_t i = 0; i < names.size(); i++)
     {
         std::cout << std::string(70, '-') << std::endl;
-        std::cout << utf8(names[i]) << " " << utf8(handles[i]) << std::endl;
+        std::cout << utf8(names[i]) << " " << utf8(handles[i]) << " (" << points[i][0] << ", " << points[i][1] << ", " << points[i][2] << ")" << std::endl;
         for (size_t j = 0; j < attrs_list[i].size(); j++)
         {
             std::cout << "attr " << utf8(attrs_list[i][j].first) << " = " << utf8(attrs_list[i][j].second) << std::endl;

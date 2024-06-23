@@ -25,7 +25,8 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
     std::vector<std::vector<std::pair<BSTR, BSTR>>>* const attrs_list,
     std::vector<std::vector<std::pair<BSTR, VARIANT>>>* const props_list,
     std::vector<BSTR>* const handles,
-    std::function<void(int processed, int total)> callback
+    std::function<void(int processed, int total)> callback,
+    std::vector<std::vector<double>>* const points
 )
 {
 #ifdef AE_EXPORT
@@ -127,6 +128,28 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
             }
 
             long lower_bound, upper_bound;
+
+            if (points)
+            {
+                std::vector<double> point;
+
+                VARIANT InsertionPoint;
+                THROW_IF_FAILED(block->get_InsertionPoint(&InsertionPoint));
+
+                THROW_IF_FAILED(SafeArrayGetLBound(V_ARRAY(&InsertionPoint), 1, &lower_bound));
+                THROW_IF_FAILED(SafeArrayGetUBound(V_ARRAY(&InsertionPoint), 1, &upper_bound));
+
+                for (long j = lower_bound; j <= upper_bound; j++)
+                {
+                    double coord;
+                    THROW_IF_FAILED(SafeArrayGetElement(V_ARRAY(&InsertionPoint), &j, &coord));
+                    point.push_back(coord);
+                }
+
+                THROW_IF_FAILED(VariantClear(&InsertionPoint));
+
+                points->push_back(std::move(point));
+            }
 
             // attrs
 
@@ -254,7 +277,8 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
     std::vector<std::vector<std::pair<BSTR, BSTR>>>* const attrs_list,
     std::vector<std::vector<std::pair<BSTR, VARIANT>>>* const props_list,
     std::vector<BSTR>* const handles,
-    std::function<void(int processed, int total)> callback
+    std::function<void(int processed, int total)> callback,
+    std::vector<std::vector<double>>* const points
 )
 {
 #ifdef AE_EXPORT
@@ -334,6 +358,7 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
     DISPID EntityNameDispID = DISPID_UNKNOWN;
     DISPID EffectiveNameDispID = DISPID_UNKNOWN;
     DISPID HandleDispID = DISPID_UNKNOWN;
+    DISPID InsertionPointDispID = DISPID_UNKNOWN;
     DISPID GetAttributesDispID = DISPID_UNKNOWN;
     DISPID TagStringDispID = DISPID_UNKNOWN;
     DISPID TextStringDispID = DISPID_UNKNOWN;
@@ -378,6 +403,28 @@ AE_EXTERN_C long AE_DECL_SPEC select_on_screen
             }
 
             long lower_bound, upper_bound;
+
+            if (points)
+            {
+                std::vector<double> point;
+
+                VARIANT InsertionPoint;
+                com_req(&InsertionPoint, Item, DISPATCH_PROPERTYGET, L"InsertionPoint", &InsertionPointDispID, args, 0);
+
+                THROW_IF_FAILED(SafeArrayGetLBound(V_ARRAY(&InsertionPoint), 1, &lower_bound));
+                THROW_IF_FAILED(SafeArrayGetUBound(V_ARRAY(&InsertionPoint), 1, &upper_bound));
+
+                for (long j = lower_bound; j <= upper_bound; j++)
+                {
+                    double coord;
+                    THROW_IF_FAILED(SafeArrayGetElement(V_ARRAY(&InsertionPoint), &j, &coord));
+                    point.push_back(coord);
+                }
+
+                THROW_IF_FAILED(VariantClear(&InsertionPoint));
+
+                points->push_back(std::move(point));
+            }
 
             // attrs
 

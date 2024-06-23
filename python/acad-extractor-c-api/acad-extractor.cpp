@@ -12,7 +12,8 @@ static PyObject* select_on_screen(PyObject* self, PyObject* args)
     PyObject* props_list_py = Py_None;
     PyObject* handles_py = Py_None;
     PyObject* callback_py = Py_None;
-    if (!PyArg_ParseTuple(args, "OOO|OO", &names_py, &attrs_list_py, &props_list_py, &handles_py, &callback_py))
+    PyObject* points_py = Py_None;
+    if (!PyArg_ParseTuple(args, "OOO|OOO", &names_py, &attrs_list_py, &props_list_py, &handles_py, &callback_py, &points_py))
     {
         PyErr_SetString(PyExc_RuntimeError, "bad args");
         return 0;
@@ -42,6 +43,11 @@ static PyObject* select_on_screen(PyObject* self, PyObject* args)
         PyErr_SetString(PyExc_RuntimeError, "callback is not not callable");
         return 0;
     }
+    if (!PyList_Check(points_py))
+    {
+        PyErr_SetString(PyExc_RuntimeError, "points is not not list");
+        return 0;
+    }
 
     std::vector<BSTR> names;
     std::vector<std::vector<std::pair<BSTR, BSTR>>> attrs_list;
@@ -58,9 +64,10 @@ static PyObject* select_on_screen(PyObject* self, PyObject* args)
             Py_XDECREF(args);
         };
     }
+    std::vector<std::vector<double>> points;
     try
     {
-        long dt = select_on_screen(&names, &attrs_list, &props_list, handles_py != Py_None ? &handles : 0, callback);
+        long dt = select_on_screen(&names, &attrs_list, &props_list, handles_py != Py_None ? &handles : 0, callback, points_py != Py_None ? &points : 0);
 
         for (const BSTR& name : names)
         {
@@ -78,6 +85,22 @@ static PyObject* select_on_screen(PyObject* self, PyObject* args)
                 SysFreeString(handle);
                 PyList_Append(handles_py, handle_py);
                 Py_XDECREF(handle_py);
+            }
+        }
+
+        if (points_py != Py_None)
+        {
+            for (const auto& point : points)
+            {
+                PyObject* point_py = PyList_New(0);
+                for (const auto& coord : point)
+                {
+                    PyObject* coord_py = PyFloat_FromDouble(coord);
+                    PyList_Append(point_py, coord_py);
+                    Py_XDECREF(coord_py);
+                }
+                PyList_Append(points_py, point_py);
+                Py_XDECREF(point_py);
             }
         }
 
