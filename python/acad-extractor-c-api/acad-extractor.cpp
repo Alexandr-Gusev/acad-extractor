@@ -5,6 +5,21 @@
 
 #include "../../cpp/core.h"
 
+struct NonPythonCode
+{
+    PyThreadState* thread_state;
+    NonPythonCode(): thread_state(PyEval_SaveThread()) {}
+    ~NonPythonCode() {PyEval_RestoreThread(thread_state);}
+};
+
+struct PythonCode
+{
+    PyThreadState** thread_state_ptr;
+    PythonCode(PyThreadState** thread_state_ptr): thread_state_ptr(thread_state_ptr) {PyEval_RestoreThread(*thread_state_ptr);}
+    ~PythonCode() {*thread_state_ptr = PyEval_SaveThread();}
+};
+
+
 static PyObject* select_on_screen(PyObject* self, PyObject* args)
 {
     PyObject* names_py = Py_None;
@@ -54,20 +69,26 @@ static PyObject* select_on_screen(PyObject* self, PyObject* args)
     std::vector<std::vector<std::pair<BSTR, VARIANT>>> props_list;
     std::vector<BSTR> handles;
     std::function<void(int processed, int total)> callback;
-    if (callback_py != Py_None)
-    {
-        callback = [callback_py](int processed, int total)
-        {
-            PyObject* args = Py_BuildValue("(ii)", processed, total);
-            PyObject* result = PyObject_Call(callback_py, args, 0);
-            Py_XDECREF(result);
-            Py_XDECREF(args);
-        };
-    }
     std::vector<std::vector<double>> points;
     try
     {
-        long dt = select_on_screen(&names, &attrs_list, &props_list, handles_py != Py_None ? &handles : 0, callback, points_py != Py_None ? &points : 0);
+        long dt;
+        {
+            NonPythonCode npc;
+            if (callback_py != Py_None)
+            {
+                PyThreadState** thread_state_ptr = &npc.thread_state;
+                callback = [thread_state_ptr, callback_py](int processed, int total)
+                {
+                    PythonCode pc(thread_state_ptr);
+                    PyObject* args = Py_BuildValue("(ii)", processed, total);
+                    PyObject* result = PyObject_Call(callback_py, args, 0);
+                    Py_XDECREF(result);
+                    Py_XDECREF(args);
+                };
+            }
+            dt = select_on_screen(&names, &attrs_list, &props_list, handles_py != Py_None ? &handles : 0, callback, points_py != Py_None ? &points : 0);
+        }
 
         for (const BSTR& name : names)
         {
